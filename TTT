@@ -1,0 +1,29 @@
+local S = Instance.new("ScreenGui")
+local T = Instance.new("TextButton")
+local U = Instance.new("UICorner")
+
+S.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+S.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+T.Parent = ScreenGui
+T.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+T.BorderColor3 = Color3.fromRGB(0, 0, 0)
+T.BorderSizePixel = 0
+T.Position = UDim2.new(0.120481931, 0, 0.220441192, 0)
+T.Size = UDim2.new(0, 55, 0, 55)
+T.Font = Enum.Font.Highway
+T.Text = "OFF"
+T.TextColor3 = Color3.fromRGB(255, 255, 255)
+T.TextSize = 20.000
+T.TextWrapped = true
+T.MouseButton1Click:Connect(function()
+    if T.Text == "ON" then
+        T.Text = "OFF"
+    elseif T.Text == "OFF" then
+        T.Text = "ON"
+    else
+        T.Text = "YOUR EXPLOIT IS NOT SUPPORTED"
+    end
+end)
+
+U.Parent = T
