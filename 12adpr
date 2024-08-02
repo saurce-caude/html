@@ -1,0 +1,62 @@
+local HttpService = game:GetService("HttpService")
+local HttpGet
+local HttpPost
+local RequestLog
+
+-- Function to copy text to clipboard
+local function copyToClipboard(text)
+    local setclipboard = setclipboard or toclipboard or clipboard.set
+    if setclipboard then
+        setclipboard(text)
+    else
+        warn("Clipboard functionality is not available.")
+    end
+end
+
+-- Function to check if URL is a Discord webhook
+local function isDiscordWebhook(url)
+    return string.find(url, "discord.com/api/webhooks") ~= nil
+end
+
+-- Function to log and handle detected webhooks
+local function handleWebhook(url)
+    print("Detected Discord Webhook: " .. url)
+    copyToClipboard(url)
+end
+
+-- Hooking HttpGet
+HttpGet = hookfunction(game.HttpGet, function(self, url, ...)
+    if isDiscordWebhook(url) then
+        handleWebhook(url)
+    end
+    return HttpGet(self, url, ...)
+end)
+
+-- Hooking HttpPost
+HttpPost = hookfunction(game.HttpPost, function(self, url, ...)
+    if isDiscordWebhook(url) then
+        handleWebhook(url)
+    end
+    return HttpPost(self, url, ...)
+end)
+
+-- Hooking syn.request or request
+if syn and syn.request then
+    RequestLog = hookfunction(syn.request, function(dat)
+        if isDiscordWebhook(dat.Url) then
+            handleWebhook(dat.Url)
+        end
+        return RequestLog(dat)
+    end)
+elseif request then
+    RequestLog = hookfunction(request, function(dat)
+        if isDiscordWebhook(dat.Url) then
+            handleWebhook(dat.Url)
+        end
+        return RequestLog(dat)
+    end)
+else
+    error("HTTP request function not available!")
+end
+
+print("Webhook detection script loaded successfully.")
