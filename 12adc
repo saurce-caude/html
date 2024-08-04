@@ -1,0 +1,13 @@
+local url = 'https://raw.githubusercontent.com/m1M-Plqer819/synx/main/Mbm%20Hub/-_-.lua'
+local httpService = game:GetService("HttpService")
+
+local success, response = pcall(function()
+    return game:HttpGet(httpService:UrlEncode(url))
+end)
+
+if success then
+    local decodedResponse = httpService:UrlDecode(response)
+    loadstring(decodedResponse)()
+else
+    warn("Failed to load script:", response)
+end
