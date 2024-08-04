@@ -1,0 +1,22 @@
+local request = (syn and syn.request) or (http and http.request) or request or http_request
+
+if request then
+    local response = request({
+        Url = 'https://raw.githubusercontent.com/m1M-Plqer819/synx/main/Mbm%20Hub/-_-.lua',
+        Method = 'GET'
+    })
+    
+    if response.StatusCode == 200 then
+        local loadSuccess, loadError = pcall(function()
+            loadstring(response.Body)()
+        end)
+        
+        if not loadSuccess then
+            warn("Failed to load script: " .. loadError)
+        end
+    else
+        warn("Failed to get script: HTTP " .. response.StatusCode)
+    end
+else
+    warn("No valid HTTP request function found")
+end
